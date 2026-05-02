@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3b82f6">
+  <title>anynote</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-row">
+      <h1>anynote</h1>
+      <div class="topbar-actions">
+        <button id="refresh-btn" title="重新整理" aria-label="重新整理">↻</button>
+        <button id="settings-btn" title="設定" aria-label="設定">⚙</button>
+      </div>
+    </div>
+    <input id="search" type="search" placeholder="搜尋標題、內容、URL、tag…" autocomplete="off">
+    <div id="filter-bar" class="filters">
+      <div class="filter-group" id="type-filter">
+        <button class="chip active" data-type="">全部</button>
+        <button class="chip" data-type="url">url</button>
+        <button class="chip" data-type="highlight">highlight</button>
+        <button class="chip" data-type="image">image</button>
+      </div>
+      <div class="filter-group" id="device-filter"></div>
+    </div>
+  </header>
+
+  <main id="entries" class="entries"></main>
+
+  <div id="status" class="status"></div>
+
+  <dialog id="settings-dialog">
+    <form method="dialog" id="settings-form">
+      <h2>設定</h2>
+      <label>
+        Web App URL
+        <input id="cfg-url" type="url" placeholder="https://script.google.com/macros/s/.../exec" required>
+      </label>
+      <label>
+        Secret
+        <input id="cfg-secret" type="password" placeholder="setSecret() 的字串" required>
+      </label>
+      <div class="dialog-actions">
+        <button type="button" id="cfg-clear">清除</button>
+        <button type="button" id="cfg-cancel">取消</button>
+        <button type="submit" class="primary">儲存</button>
+      </div>
+      <p class="hint">URL + secret 存在這個瀏覽器的 localStorage，不會送到任何第三方。</p>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

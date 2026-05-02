@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "anynote",
+  "version": "0.1",
+  "description": "Save links, highlights, and images to anynote (Google Sheets backend).",
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "notifications",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://script.google.com/*",
+    "https://script.googleusercontent.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "anynote",
+    "default_icon": "icon48.png"
+  },
+  "icons": {
+    "48": "icon48.png"
+  }
+}
