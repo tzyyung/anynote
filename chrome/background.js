@@ -32,20 +32,47 @@ async function handleAction(info, tab) {
   try {
     const cfg = await getConfig();
     if (!cfg) {
+      setBadge("!", "#ef4444", "Open extension options to set URL + secret first");
       notify("anynote", "Open extension options to set URL + secret first");
       chrome.runtime.openOptionsPage();
       return;
     }
     const payload = await buildPayload(info, tab);
-    if (!payload) { notify("anynote", "nothing to save"); return; }
+    if (!payload) {
+      setBadge("?", "#9ca3af", "nothing to save");
+      notify("anynote", "nothing to save");
+      return;
+    }
+    setBadge("…", "#3b82f6", "sending…");
     notify("anynote", "sending…");
     const result = await postToBackend(cfg, payload);
-    if (result.ok) notify("anynote", `saved ✓ (row ${result.row})`);
-    else notify("anynote", `failed: ${result.error || "unknown"}`);
+    if (result.ok) {
+      setBadge("✓", "#16a34a", `saved ✓ (row ${result.row})`);
+      clearBadgeAfter(2500);
+      notify("anynote", `saved ✓ (row ${result.row})`);
+    } else {
+      setBadge("✗", "#ef4444", `failed: ${result.error || "unknown"}`);
+      notify("anynote", `failed: ${result.error || "unknown"}`);
+    }
   } catch (err) {
     console.error("[anynote]", err);
+    setBadge("✗", "#ef4444", `error: ${err.message || err}`);
     notify("anynote", `error: ${err.message || err}`);
   }
+}
+
+function setBadge(text, color, title) {
+  chrome.action.setBadgeText({ text });
+  chrome.action.setBadgeBackgroundColor({ color });
+  if (title) chrome.action.setTitle({ title: `anynote — ${title}` });
+}
+let _badgeTimer = null;
+function clearBadgeAfter(ms) {
+  clearTimeout(_badgeTimer);
+  _badgeTimer = setTimeout(() => {
+    chrome.action.setBadgeText({ text: "" });
+    chrome.action.setTitle({ title: "anynote: save this page" });
+  }, ms);
 }
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
