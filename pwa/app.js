@@ -129,11 +129,26 @@ async function refresh() {
   setStatus("讀取中…");
   $("#refresh-btn").disabled = true;
   try {
-    const body = new URLSearchParams();
-    body.set("secret", cfg.secret);
-    body.set("action", "list");
-    const resp = await fetch(cfg.url, { method: "POST", body, redirect: "follow" });
-    const json = await resp.json();
+    const params = new URLSearchParams();
+    params.set("secret", cfg.secret);
+    params.set("action", "list");
+    // Explicit options for iOS Safari (which is fussy about cross-origin redirect chain).
+    const resp = await fetch(cfg.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+      body: params.toString(),
+      mode: "cors",
+      credentials: "omit",
+      redirect: "follow",
+      cache: "no-store",
+    });
+    if (!resp.ok && resp.status !== 0) {
+      throw new Error(`HTTP ${resp.status}`);
+    }
+    const text = await resp.text();
+    let json;
+    try { json = JSON.parse(text); }
+    catch { throw new Error(`non-JSON: ${text.slice(0, 80)}`); }
     if (!json.ok) throw new Error(json.error || "unknown");
     state.entries = json.entries || [];
     saveCache(state.entries);
@@ -141,8 +156,8 @@ async function refresh() {
     render();
     setStatus(`已載入 ${state.entries.length} 筆`);
   } catch (err) {
-    console.error(err);
-    setStatus("載入失敗：" + (err.message || err));
+    console.error("[anynote] refresh failed:", err);
+    setStatus("載入失敗：" + (err.message || String(err)));
   } finally {
     $("#refresh-btn").disabled = false;
   }

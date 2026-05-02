@@ -1,6 +1,6 @@
 // Minimal service worker: cache-first for app shell, network-first for everything else.
 // Bump CACHE_VERSION when you ship a new shell.
-const CACHE_VERSION = "anynote-v1";
+const CACHE_VERSION = "anynote-v2";
 const SHELL = [
   "./",
   "./index.html",
