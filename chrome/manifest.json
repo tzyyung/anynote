@@ -22,8 +22,17 @@
     "open_in_tab": true
   },
   "action": {
-    "default_title": "anynote",
+    "default_title": "anynote: save this page",
     "default_icon": "icon48.png"
+  },
+  "commands": {
+    "save-page-shortcut": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Save current page to anynote"
+    }
   },
   "icons": {
     "48": "icon48.png"

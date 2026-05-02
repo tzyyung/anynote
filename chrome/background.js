@@ -11,7 +11,24 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+chrome.action.onClicked.addListener(async (tab) => {
+  await savePageFromTab(tab);
+});
+
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command !== "save-page-shortcut") return;
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tab) await savePageFromTab(tab);
+});
+
+async function savePageFromTab(tab) {
+  await handleAction(
+    { menuItemId: "save-page", pageUrl: tab.url || "" },
+    tab
+  );
+}
+
+async function handleAction(info, tab) {
   try {
     const cfg = await getConfig();
     if (!cfg) {
@@ -19,21 +36,20 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       chrome.runtime.openOptionsPage();
       return;
     }
-
     const payload = await buildPayload(info, tab);
     if (!payload) { notify("anynote", "nothing to save"); return; }
-
     notify("anynote", "sending…");
     const result = await postToBackend(cfg, payload);
-    if (result.ok) {
-      notify("anynote", `saved ✓ (row ${result.row})`);
-    } else {
-      notify("anynote", `failed: ${result.error || "unknown"}`);
-    }
+    if (result.ok) notify("anynote", `saved ✓ (row ${result.row})`);
+    else notify("anynote", `failed: ${result.error || "unknown"}`);
   } catch (err) {
     console.error("[anynote]", err);
     notify("anynote", `error: ${err.message || err}`);
   }
+}
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  await handleAction(info, tab);
 });
 
 async function buildPayload(info, tab) {
